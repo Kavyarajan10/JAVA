@@ -1,3 +1,4 @@
+import java.util.Scanner;
 public class program4 {
     public static void main(String[] args) {
         int a = 5, b = 10;
@@ -8,3 +9,4 @@ public class program4 {
         System.out.println("a = " + a + ", b = " + b);
     }
 }
+
