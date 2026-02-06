@@ -1,0 +1,276 @@
+mysql> use Employee_detail;
+Database changed
+mysql> show tables;
++---------------------------+
+| Tables_in_employee_detail |
++---------------------------+
+| departments               |
+| employees                 |
++---------------------------+
+2 rows in set (0.07 sec)
+
+mysql> insert into departments (dept_id, dept_name) values (101, IT), (102, NON-IT);
+ERROR 1054 (42S22): Unknown column 'IT' in 'field list'
+mysql> insert into departments (dept_id, dept_name) values (101, "IT"), (102, "NON-IT");
+Query OK, 2 rows affected (0.03 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> insert into employees values(201, "Sarun", 101, 45000, 3, "2023-05-01");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into employees values(202, "Dharsh", 101, 25000, 1, "2025-07-06");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into employees values(203, "Kamalesh", 102, 28000, 2, "2024-07-27");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into employees values(204, "Kishore", 101, 78000, 6, "2020-10-18");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into employees values(205, "Deepak", 102, 27000, 2, "2024-11-23");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from departments;
++---------+-----------+
+| dept_id | dept_name |
++---------+-----------+
+|     101 | IT        |
+|     102 | NON-IT    |
++---------+-----------+
+2 rows in set (0.00 sec)
+
+mysql> select * from employees;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    201 | Sarun    |     101 | 45000.00 |          3 | 2023-05-01 |
+|    202 | Dharsh   |     101 | 25000.00 |          1 | 2025-07-06 |
+|    203 | Kamalesh |     102 | 28000.00 |          2 | 2024-07-27 |
+|    204 | Kishore  |     101 | 78000.00 |          6 | 2020-10-18 |
+|    205 | Deepak   |     102 | 27000.00 |          2 | 2024-11-23 |
++--------+----------+---------+----------+------------+------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from employees where dept_id = 102;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    203 | Kamalesh |     102 | 28000.00 |          2 | 2024-07-27 |
+|    205 | Deepak   |     102 | 27000.00 |          2 | 2024-11-23 |
++--------+----------+---------+----------+------------+------------+
+2 rows in set (0.02 sec)
+
+mysql> select * from employees where salary>40000;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    201 | Sarun    |     101 | 45000.00 |          3 | 2023-05-01 |
+|    204 | Kishore  |     101 | 78000.00 |          6 | 2020-10-18 |
++--------+----------+---------+----------+------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from employees where salary between 26000 and 50000;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    201 | Sarun    |     101 | 45000.00 |          3 | 2023-05-01 |
+|    203 | Kamalesh |     102 | 28000.00 |          2 | 2024-07-27 |
+|    205 | Deepak   |     102 | 27000.00 |          2 | 2024-11-23 |
++--------+----------+---------+----------+------------+------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from employees where salary IN("IT");
+Empty set, 1 warning (0.00 sec)
+
+mysql> select * from employees where experience IN(2,4);
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    203 | Kamalesh |     102 | 28000.00 |          2 | 2024-07-27 |
+|    205 | Deepak   |     102 | 27000.00 |          2 | 2024-11-23 |
++--------+----------+---------+----------+------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from employees where emp_name 'D%';
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''D%'' at line 1
+mysql> select * from employees where emp_name like 'D%';
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    202 | Dharsh   |     101 | 25000.00 |          1 | 2025-07-06 |
+|    205 | Deepak   |     102 | 27000.00 |          2 | 2024-11-23 |
++--------+----------+---------+----------+------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> select name from employees where name like '%sh';
+ERROR 1054 (42S22): Unknown column 'name' in 'field list'
+mysql> select emp_name from employees where emp_name like '%sh';
++----------+
+| emp_name |
++----------+
+| Dharsh   |
+| Kamalesh |
++----------+
+2 rows in set (0.00 sec)
+
+mysql> select * from employees order by emp_name;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    205 | Deepak   |     102 | 27000.00 |          2 | 2024-11-23 |
+|    202 | Dharsh   |     101 | 25000.00 |          1 | 2025-07-06 |
+|    203 | Kamalesh |     102 | 28000.00 |          2 | 2024-07-27 |
+|    204 | Kishore  |     101 | 78000.00 |          6 | 2020-10-18 |
+|    201 | Sarun    |     101 | 45000.00 |          3 | 2023-05-01 |
++--------+----------+---------+----------+------------+------------+
+5 rows in set (0.01 sec)
+
+mysql> select * from employees order by emp_name desc;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    201 | Sarun    |     101 | 45000.00 |          3 | 2023-05-01 |
+|    204 | Kishore  |     101 | 78000.00 |          6 | 2020-10-18 |
+|    203 | Kamalesh |     102 | 28000.00 |          2 | 2024-07-27 |
+|    202 | Dharsh   |     101 | 25000.00 |          1 | 2025-07-06 |
+|    205 | Deepak   |     102 | 27000.00 |          2 | 2024-11-23 |
++--------+----------+---------+----------+------------+------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from employees order by salary desc limit 3;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    204 | Kishore  |     101 | 78000.00 |          6 | 2020-10-18 |
+|    201 | Sarun    |     101 | 45000.00 |          3 | 2023-05-01 |
+|    203 | Kamalesh |     102 | 28000.00 |          2 | 2024-07-27 |
++--------+----------+---------+----------+------------+------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from employees order by name desc limit 2 offset 0;
+ERROR 1054 (42S22): Unknown column 'name' in 'order clause'
+mysql> select * from employees order by emp_name desc limit 2 offset 0;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    201 | Sarun    |     101 | 45000.00 |          3 | 2023-05-01 |
+|    204 | Kishore  |     101 | 78000.00 |          6 | 2020-10-18 |
++--------+----------+---------+----------+------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from employees order by emp_name desc limit 2 offset 3;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    202 | Dharsh   |     101 | 25000.00 |          1 | 2025-07-06 |
+|    205 | Deepak   |     102 | 27000.00 |          2 | 2024-11-23 |
++--------+----------+---------+----------+------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from employees order by emp_name desc limit 2 offset 3,2;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ',2' at line 1
+mysql> select * from employees order by emp_name desc limit 2, 2;
++--------+----------+---------+----------+------------+------------+
+| emp_id | emp_name | dept_id | salary   | experience | join_date  |
++--------+----------+---------+----------+------------+------------+
+|    203 | Kamalesh |     102 | 28000.00 |          2 | 2024-07-27 |
+|    202 | Dharsh   |     101 | 25000.00 |          1 | 2025-07-06 |
++--------+----------+---------+----------+------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> insert into employees values(206, "Deepak", 102, 27000, 2, "2024-11-23");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select distinct emp_name from employees;
++----------+
+| emp_name |
++----------+
+| Sarun    |
+| Dharsh   |
+| Kamalesh |
+| Kishore  |
+| Deepak   |
++----------+
+5 rows in set (0.01 sec)
+
+mysql> -------------------------Aggregate------------------------;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-------------------------Aggregate------------------------' at line 1
+mysql> seelct count(*) from departments;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'seelct count(*) from departments' at line 1
+mysql> seelct count(emp_id) from departments;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'seelct count(emp_id) from departments' at line 1
+mysql> selct count(*) from departments;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'selct count(*) from departments' at line 1
+mysql> select count(*) from departments;
++----------+
+| count(*) |
++----------+
+|        2 |
++----------+
+1 row in set (0.01 sec)
+
+mysql> select sum(salary) from employees;
++-------------+
+| sum(salary) |
++-------------+
+|   230000.00 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> select avg(salary) from employees;
++--------------+
+| avg(salary)  |
++--------------+
+| 38333.333333 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> select min(salary), max(salary) from employees;
++-------------+-------------+
+| min(salary) | max(salary) |
++-------------+-------------+
+|    25000.00 |    78000.00 |
++-------------+-------------+
+1 row in set (0.00 sec)
+
+mysql> select name, min(salary) from employees group by name;
+ERROR 1054 (42S22): Unknown column 'name' in 'field list'
+mysql> select emp_name, min(salary) from employees group by emp_name;
++----------+-------------+
+| emp_name | min(salary) |
++----------+-------------+
+| Sarun    |    45000.00 |
+| Dharsh   |    25000.00 |
+| Kamalesh |    28000.00 |
+| Kishore  |    78000.00 |
+| Deepak   |    27000.00 |
++----------+-------------+
+5 rows in set (0.00 sec)
+
+mysql> select dept_id, min(salary) from employees group by dept_id;
++---------+-------------+
+| dept_id | min(salary) |
++---------+-------------+
+|     101 |    25000.00 |
+|     102 |    27000.00 |
++---------+-------------+
+2 rows in set (0.00 sec)
+
+mysql> select dept_id, max(salary) from employees group by dept_id;
++---------+-------------+
+| dept_id | max(salary) |
++---------+-------------+
+|     101 |    78000.00 |
+|     102 |    28000.00 |
++---------+-------------+
+2 rows in set (0.00 sec)
+
+mysql> select dept_id ,max(salary) from employees group by dept_id having max(salary)>50000;
++---------+-------------+
+| dept_id | max(salary) |
++---------+-------------+
+|     101 |    78000.00 |
++---------+-------------+
+1 row in set (0.00 sec)
+
+mysql> Terminal close -- exit!

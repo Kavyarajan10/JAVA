@@ -1,0 +1,73 @@
+mysql> create database library_db;
+Query OK, 1 row affected (0.02 sec)
+
+mysql> use library_db
+Database changed
+mysql> CREATE TABLE authors (
+    ->     author_id INT PRIMARY KEY,
+    ->     author_name VARCHAR(100) NOT NULL,
+    ->     email VARCHAR(100) UNIQUE
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE books (
+    ->     book_id INT PRIMARY KEY,
+    ->     title VARCHAR(150) NOT NULL,
+    ->     author_id INT,
+    ->     price DECIMAL(8,2) CHECK (price > 0),
+    ->     status VARCHAR(20) DEFAULT 'available',
+    ->     CONSTRAINT fk_books_author
+    ->         FOREIGN KEY (author_id) REFERENCES authors(author_id)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE members (
+    ->     member_id INT PRIMARY KEY,
+    ->     member_name VARCHAR(100) NOT NULL,
+    ->     phone VARCHAR(15) UNIQUE,
+    ->     join_date DATE
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE issue_records (
+    ->     issue_id INT PRIMARY KEY,
+    ->     book_id INT,
+    ->     member_id INT,
+    ->     issue_date DATE NOT NULL,
+    ->     return_date DATE,
+    ->     CONSTRAINT fk_issue_book
+    ->         FOREIGN KEY (book_id) REFERENCES books(book_id),
+    ->     CONSTRAINT fk_issue_member
+    ->         FOREIGN KEY (member_id) REFERENCES members(member_id)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> ALTER TABLE books
+    -> ADD publisher VARCHAR(50);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE books
+    -> MODIFY publisher VARCHAR(100);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE books
+    -> DROP publisher;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> RENAME TABLE members TO library_members;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> TRUNCATE TABLE issue_records;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> DROP TABLE books;
+ERROR 3730 (HY000): Cannot drop table 'books' referenced by a foreign key constraint 'fk_issue_book' on table 'issue_records'.
+mysql> DROP DATABASE library_db;
+Query OK, 4 rows affected (0.04 sec)
+
+mysql> \T
+Currently logging to file 'DDltask1.txt'
+mysql> exit

@@ -1,0 +1,327 @@
+mysql> create database company;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use company;
+Database changed
+mysql> CREATE TABLE employees (
+    ->     emp_id INT PRIMARY KEY,
+    ->     emp_name VARCHAR(50),
+    ->     department VARCHAR(30),
+    ->     salary INT
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> 
+mysql> CREATE TABLE projects (
+    ->     project_id INT PRIMARY KEY,
+    ->     project_name VARCHAR(50),
+    ->     budget INT
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> 
+mysql> CREATE TABLE employee_project (
+    ->     id INT PRIMARY KEY,
+    ->     emp_id INT,
+    ->     project_id INT
+    -> )
+    -> 
+    -> ;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO employees VALUES
+    -> (101, 'Arun', 'IT', 75000),
+    -> (102, 'Meena', 'HR', 45000),
+    -> (103, 'Ravi', 'Finance', 85000),
+    -> (104, 'Priya', 'IT', 60000),
+    -> (105, 'Kiran', 'Sales', 50000),
+    -> (106, 'Neha', 'HR', 55000),
+    -> (107, 'Vijay', 'Finance', 40000),
+    -> (108, 'Anita', 'Sales', 90000);
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO projects VALUES
+    -> (201, 'ERP', 1500000),
+    -> (202, 'CRM', 1200000),
+    -> (203, 'Website', 400000),
+    -> (204, 'Mobile App', 800000);
+Query OK, 4 rows affected (0.00 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO employee_project VALUES
+    -> (1, 101, 201),
+    -> (2, 101, 202),
+    -> (3, 102, 203),
+    -> (4, 103, 201),
+    -> (5, 104, 204),
+    -> (6, 105, 203),
+    -> (7, 106, 202),
+    -> (8, 108, 201);
+Query OK, 8 rows affected (0.00 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM employees
+    -> WHERE salary > (SELECT AVG(salary) FROM employees);
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+3 rows in set (0.01 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE salary = (SELECT MAX(salary) FROM employees);
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE salary = (SELECT MIN(salary) FROM employees);
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    107 | Vijay    | Finance    |  40000 |
++--------+----------+------------+--------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE salary = (SELECT AVG(salary) FROM employees);
+Empty set (0.00 sec)
+
+mysql> SELECT department FROM employees
+    -> GROUP BY department
+    -> HAVING AVG(salary) > 50000;
++------------+
+| department |
++------------+
+| IT         |
+| Finance    |
+| Sales      |
++------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE emp_id IN (
+    ->     SELECT emp_id FROM employee_project
+    ->     WHERE project_id IN (
+    ->         SELECT project_id FROM projects WHERE budget > 1000000
+    ->     )
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    106 | Neha     | HR         |  55000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> SELECT * FROM employees
+    -> WHERE emp_id IN (
+    ->     SELECT emp_id FROM employee_project
+    ->     WHERE project_id IN (201, 202)
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    106 | Neha     | HR         |  55000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE emp_id NOT IN (
+    ->     SELECT emp_id FROM employee_project
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    107 | Vijay    | Finance    |  40000 |
++--------+----------+------------+--------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE emp_id IN (
+    ->     SELECT emp_id FROM employee_project
+    ->     WHERE project_id IN (
+    ->         SELECT project_id FROM projects
+    ->         WHERE project_name IN ('ERP', 'CRM')
+    ->     )
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    106 | Neha     | HR         |  55000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE salary > ANY (
+    ->     SELECT salary FROM employees WHERE department = 'HR'
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    104 | Priya    | IT         |  60000 |
+|    105 | Kiran    | Sales      |  50000 |
+|    106 | Neha     | HR         |  55000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE salary < ANY (
+    ->     SELECT salary FROM employees WHERE department = 'Finance'
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    102 | Meena    | HR         |  45000 |
+|    104 | Priya    | IT         |  60000 |
+|    105 | Kiran    | Sales      |  50000 |
+|    106 | Neha     | HR         |  55000 |
+|    107 | Vijay    | Finance    |  40000 |
++--------+----------+------------+--------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE salary > ALL (
+    ->     SELECT salary FROM employees WHERE department = 'Sales'
+    -> );
+Empty set (0.00 sec)
+
+mysql> SELECT * FROM employees e
+    -> WHERE salary >= ALL (
+    ->     SELECT salary FROM employees
+    ->     WHERE department = e.department
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    106 | Neha     | HR         |  55000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> 
+mysql> SELECT * FROM employees e
+    -> WHERE salary > (
+    ->     SELECT AVG(salary) FROM employees
+    ->     WHERE department = e.department
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    106 | Neha     | HR         |  55000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employees e
+    -> WHERE salary = (
+    ->     SELECT MAX(salary) FROM employees
+    ->     WHERE department = e.department
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    106 | Neha     | HR         |  55000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employees e
+    -> WHERE salary < (
+    ->     SELECT AVG(salary) FROM employees
+    ->     WHERE department = e.department
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    102 | Meena    | HR         |  45000 |
+|    104 | Priya    | IT         |  60000 |
+|    105 | Kiran    | Sales      |  50000 |
+|    107 | Vijay    | Finance    |  40000 |
++--------+----------+------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE emp_id IN (
+    ->     SELECT emp_id FROM employee_project
+    ->     WHERE project_id IN (
+    ->         SELECT project_id FROM projects
+    ->         WHERE budget > (SELECT AVG(budget) FROM projects)
+    ->     )
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    101 | Arun     | IT         |  75000 |
+|    103 | Ravi     | Finance    |  85000 |
+|    106 | Neha     | HR         |  55000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT DISTINCT department FROM employees
+    -> WHERE department IN (
+    ->     SELECT department FROM employees WHERE salary > 80000
+    -> );
++------------+
+| department |
++------------+
+| Finance    |
+| Sales      |
++------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT e.emp_id, e.emp_name
+    -> FROM employees e
+    -> WHERE NOT EXISTS (
+    ->     SELECT p.project_id FROM projects p
+    ->     WHERE p.budget > 500000
+    ->     AND NOT EXISTS (
+    ->         SELECT 1 FROM employee_project ep
+    ->         WHERE ep.emp_id = e.emp_id
+    ->         AND ep.project_id = p.project_id
+    ->     )
+    -> );
+Empty set (0.00 sec)
+
+mysql> SELECT * FROM employees
+    -> WHERE salary > (
+    ->     SELECT salary FROM employees WHERE emp_name = 'Arun'
+    -> );
++--------+----------+------------+--------+
+| emp_id | emp_name | department | salary |
++--------+----------+------------+--------+
+|    103 | Ravi     | Finance    |  85000 |
+|    108 | Anita    | Sales      |  90000 |
++--------+----------+------------+--------+
+2 rows in set (0.00 sec)
+
+mysql> exit

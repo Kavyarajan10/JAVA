@@ -1,0 +1,278 @@
+
+mysql> create database  company_db;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use company_db;
+Database changed
+mysql> CREATE TABLE employees (
+    ->     emp_id INT PRIMARY KEY,
+    ->     emp_name VARCHAR(50),
+    ->     department VARCHAR(30),
+    ->     manager_id INT
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> 
+mysql> INSERT INTO employees VALUES
+    -> (1, 'Arun', 'IT', 5),
+    -> (2, 'Bala', 'HR', 5),
+    -> (3, 'Charan', 'Finance', 6),
+    -> (4, 'Divya', 'IT', 1),
+    -> (5, 'Esha', 'Management', NULL),
+    -> (6, 'Farhan', 'Management', NULL);
+Query OK, 6 rows affected (0.00 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE projects (
+    ->     project_id INT PRIMARY KEY,
+    ->     project_name VARCHAR(50),
+    ->     emp_id INT
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> 
+mysql> INSERT INTO projects VALUES
+    -> (101, 'Payroll System', 1),
+    -> (102, 'Recruitment Portal', 2),
+    -> (103, 'Finance Tracker', 3),
+    -> (104, 'Website Revamp', NULL),
+    -> (105, 'Mobile App', 1);
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> SELECT e.emp_name, p.project_name
+    -> FROM employees e
+    -> INNER JOIN projects p
+    -> ON e.emp_id = p.emp_id;
++----------+--------------------+
+| emp_name | project_name       |
++----------+--------------------+
+| Arun     | Payroll System     |
+| Bala     | Recruitment Portal |
+| Charan   | Finance Tracker    |
+| Arun     | Mobile App         |
++----------+--------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT e.emp_name, e.department, p.project_name
+    -> FROM employees e
+    -> INNER JOIN projects p
+    -> ON e.emp_id = p.emp_id;
++----------+------------+--------------------+
+| emp_name | department | project_name       |
++----------+------------+--------------------+
+| Arun     | IT         | Payroll System     |
+| Bala     | HR         | Recruitment Portal |
+| Charan   | Finance    | Finance Tracker    |
+| Arun     | IT         | Mobile App         |
++----------+------------+--------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT p.project_name, e.emp_name
+    -> FROM projects p
+    -> INNER JOIN employees e
+    -> ON e.emp_id = p.emp_id;
++--------------------+----------+
+| project_name       | emp_name |
++--------------------+----------+
+| Payroll System     | Arun     |
+| Recruitment Portal | Bala     |
+| Finance Tracker    | Charan   |
+| Mobile App         | Arun     |
++--------------------+----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT e.emp_name, p.project_name
+    -> FROM employees e
+    -> LEFT JOIN projects p
+    -> ON e.emp_id = p.emp_id;
++----------+--------------------+
+| emp_name | project_name       |
++----------+--------------------+
+| Arun     | Mobile App         |
+| Arun     | Payroll System     |
+| Bala     | Recruitment Portal |
+| Charan   | Finance Tracker    |
+| Divya    | NULL               |
+| Esha     | NULL               |
+| Farhan   | NULL               |
++----------+--------------------+
+7 rows in set (0.00 sec)
+
+mysql> SELECT e.emp_name
+    -> FROM employees e
+    -> LEFT JOIN projects p
+    -> ON e.emp_id = p.emp_id
+    -> WHERE p.project_id IS NULL;
++----------+
+| emp_name |
++----------+
+| Divya    |
+| Esha     |
+| Farhan   |
++----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT e.emp_name, e.department, p.project_name
+    -> FROM employees e
+    -> LEFT JOIN projects p
+    -> ON e.emp_id = p.emp_id;
++----------+------------+--------------------+
+| emp_name | department | project_name       |
++----------+------------+--------------------+
+| Arun     | IT         | Mobile App         |
+| Arun     | IT         | Payroll System     |
+| Bala     | HR         | Recruitment Portal |
+| Charan   | Finance    | Finance Tracker    |
+| Divya    | IT         | NULL               |
+| Esha     | Management | NULL               |
+| Farhan   | Management | NULL               |
++----------+------------+--------------------+
+7 rows in set (0.00 sec)
+
+mysql> SELECT p.project_name, e.emp_name
+    -> FROM employees e
+    -> RIGHT JOIN projects p
+    -> ON e.emp_id = p.emp_id;
++--------------------+----------+
+| project_name       | emp_name |
++--------------------+----------+
+| Payroll System     | Arun     |
+| Recruitment Portal | Bala     |
+| Finance Tracker    | Charan   |
+| Website Revamp     | NULL     |
+| Mobile App         | Arun     |
++--------------------+----------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT p.project_name
+    -> FROM employees e
+    -> RIGHT JOIN projects p
+    -> ON e.emp_id = p.emp_id
+    -> WHERE e.emp_id IS NULL;
++----------------+
+| project_name   |
++----------------+
+| Website Revamp |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT p.project_name, e.emp_name
+    -> FROM employees e
+    -> RIGHT JOIN projects p
+    -> ON e.emp_id = p.emp_id;
++--------------------+----------+
+| project_name       | emp_name |
++--------------------+----------+
+| Payroll System     | Arun     |
+| Recruitment Portal | Bala     |
+| Finance Tracker    | Charan   |
+| Website Revamp     | NULL     |
+| Mobile App         | Arun     |
++--------------------+----------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT e.emp_name AS employee, m.emp_name AS manager
+    -> FROM employees e
+    -> LEFT JOIN employees m
+    -> ON e.manager_id = m.emp_id;
++----------+---------+
+| employee | manager |
++----------+---------+
+| Arun     | Esha    |
+| Bala     | Esha    |
+| Charan   | Farhan  |
+| Divya    | Arun    |
+| Esha     | NULL    |
+| Farhan   | NULL    |
++----------+---------+
+6 rows in set (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> SELECT e.emp_name
+    -> FROM employees e
+    -> JOIN employees m
+    -> ON e.manager_id = m.emp_id
+    -> WHERE m.emp_name = 'Esha';
++----------+
+| emp_name |
++----------+
+| Arun     |
+| Bala     |
++----------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT emp_name
+    -> FROM employees
+    -> WHERE manager_id IS NULL;
++----------+
+| emp_name |
++----------+
+| Esha     |
+| Farhan   |
++----------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT e.emp_name AS employee,
+    ->        m.emp_name AS manager,
+    ->        e.department
+    -> FROM employees e
+    -> LEFT JOIN employees m
+    -> ON e.manager_id = m.emp_id;
++----------+---------+------------+
+| employee | manager | department |
++----------+---------+------------+
+| Arun     | Esha    | IT         |
+| Bala     | Esha    | HR         |
+| Charan   | Farhan  | Finance    |
+| Divya    | Arun    | IT         |
+| Esha     | NULL    | Management |
+| Farhan   | NULL    | Management |
++----------+---------+------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT e.emp_name AS employee,
+    ->        m.emp_name AS manager,
+    ->        p.project_name
+    -> FROM employees e
+    -> LEFT JOIN employees m
+    -> ON e.manager_id = m.emp_id
+    -> LEFT JOIN projects p
+    -> ON e.emp_id = p.emp_id;
++----------+---------+--------------------+
+| employee | manager | project_name       |
++----------+---------+--------------------+
+| Arun     | Esha    | Mobile App         |
+| Arun     | Esha    | Payroll System     |
+| Bala     | Esha    | Recruitment Portal |
+| Charan   | Farhan  | Finance Tracker    |
+| Divya    | Arun    | NULL               |
+| Esha     | NULL    | NULL               |
+| Farhan   | NULL    | NULL               |
++----------+---------+--------------------+
+7 rows in set (0.00 sec)
+
+mysql> 
+mysql> SELECT e.emp_name
+    -> FROM employees e
+    -> LEFT JOIN projects p
+    -> ON e.emp_id = p.emp_id
+    -> WHERE e.manager_id IS NOT NULL
+    -> AND p.project_id IS NULL;
++----------+
+| emp_name |
++----------+
+| Divya    |
++----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT DISTINCT e.emp_name
+    -> FROM employees e
+    -> JOIN projects p
+    -> ON e.emp_id = p.emp_id
+    -> WHERE e.manager_id IS NULL;
+Empty set (0.00 sec)
+
+mysql> exit

@@ -1,0 +1,257 @@
+mysql> create database library_db;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use library_db;
+Database changed
+mysql> CREATE TABLE books (
+    ->     book_id INT PRIMARY KEY,
+    ->     title VARCHAR(100) NOT NULL,
+    ->     available_copies INT NOT NULL CHECK (available_copies >= 0)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE students (
+    ->     student_id INT PRIMARY KEY,
+    ->     student_name VARCHAR(100) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE book_issue (
+    ->     issue_id INT PRIMARY KEY,
+    ->     book_id INT,
+    ->     student_id INT,
+    ->     issue_date DATE,
+    ->     FOREIGN KEY (book_id) REFERENCES books(book_id),
+    ->     FOREIGN KEY (student_id) REFERENCES students(student_id)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> DESCRIBE books;
++------------------+--------------+------+-----+---------+-------+
+| Field            | Type         | Null | Key | Default | Extra |
++------------------+--------------+------+-----+---------+-------+
+| book_id          | int          | NO   | PRI | NULL    |       |
+| title            | varchar(100) | NO   |     | NULL    |       |
+| available_copies | int          | NO   |     | NULL    |       |
++------------------+--------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql> DESCRIBE students;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| student_id   | int          | NO   | PRI | NULL    |       |
+| student_name | varchar(100) | NO   |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> DESCRIBE book_issue;
++------------+------+------+-----+---------+-------+
+| Field      | Type | Null | Key | Default | Extra |
++------------+------+------+-----+---------+-------+
+| issue_id   | int  | NO   | PRI | NULL    |       |
+| book_id    | int  | YES  | MUL | NULL    |       |
+| student_id | int  | YES  | MUL | NULL    |       |
+| issue_date | date | YES  |     | NULL    |       |
++------------+------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> INSERT INTO books VALUES
+    -> (1, 'Python Programming', 5),
+    -> (2, 'Database Systems', 3);
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO students VALUES
+    -> (101, 'Rahul'),
+    -> (102, 'Anjali');
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM books;
++---------+--------------------+------------------+
+| book_id | title              | available_copies |
++---------+--------------------+------------------+
+|       1 | Python Programming |                5 |
+|       2 | Database Systems   |                3 |
++---------+--------------------+------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM students;
++------------+--------------+
+| student_id | student_name |
++------------+--------------+
+|        101 | Rahul        |
+|        102 | Anjali       |
++------------+--------------+
+2 rows in set (0.00 sec)
+
+mysql> SET autocommit = 0;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT @@autocommit;
++--------------+
+| @@autocommit |
++--------------+
+|            0 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> UPDATE books
+    -> SET available_copies = available_copies - 1
+    -> WHERE book_id = 1;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> INSERT INTO book_issue
+    -> VALUES (1, 1, 101, CURDATE());
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> SELECT * FROM books;
++---------+--------------------+------------------+
+| book_id | title              | available_copies |
++---------+--------------------+------------------+
+|       1 | Python Programming |                4 |
+|       2 | Database Systems   |                3 |
++---------+--------------------+------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM book_issue;
++----------+---------+------------+------------+
+| issue_id | book_id | student_id | issue_date |
++----------+---------+------------+------------+
+|        1 |       1 |        101 | 2026-01-20 |
++----------+---------+------------+------------+
+1 row in set (0.00 sec)
+
+mysql> COMMIT;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> UPDATE books
+    -> SET available_copies = available_copies - 1
+    -> WHERE book_id = 2;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> INSERT INTO book_issue
+    -> VALUES (2, 999, 102, CURDATE());
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`library_db`.`book_issue`, CONSTRAINT `book_issue_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`))
+mysql> ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT * FROM books;
++---------+--------------------+------------------+
+| book_id | title              | available_copies |
++---------+--------------------+------------------+
+|       1 | Python Programming |                4 |
+|       2 | Database Systems   |                3 |
++---------+--------------------+------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM book_issue;
++----------+---------+------------+------------+
+| issue_id | book_id | student_id | issue_date |
++----------+---------+------------+------------+
+|        1 |       1 |        101 | 2026-01-20 |
++----------+---------+------------+------------+
+1 row in set (0.00 sec)
+
+mysql> SAVEPOINT before_update;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> UPDATE books SET available_copies = available_copies - 1 WHERE book_id = 1;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> 
+mysql> INSERT INTO book_issue VALUES (3, 1, 102, CURDATE());
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SAVEPOINT after_insert;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> UPDATE books SET available_copies = available_copies - 1 WHERE book_id = 2;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> ROLLBACK TO after_insert;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+mysql> SELECT * FROM books;
++---------+--------------------+------------------+
+| book_id | title              | available_copies |
++---------+--------------------+------------------+
+|       1 | Python Programming |                3 |
+|       2 | Database Systems   |                3 |
++---------+--------------------+------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM book_issue;
++----------+---------+------------+------------+
+| issue_id | book_id | student_id | issue_date |
++----------+---------+------------+------------+
+|        1 |       1 |        101 | 2026-01-20 |
+|        3 |       1 |        102 | 2026-01-20 |
++----------+---------+------------+------------+
+2 rows in set (0.00 sec)
+
+mysql> DELETE FROM book_issue WHERE issue_id = 1;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM book_issue;
++----------+---------+------------+------------+
+| issue_id | book_id | student_id | issue_date |
++----------+---------+------------+------------+
+|        3 |       1 |        102 | 2026-01-20 |
++----------+---------+------------+------------+
+1 row in set (0.00 sec)
+
+mysql> ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT * FROM book_issue;
++----------+---------+------------+------------+
+| issue_id | book_id | student_id | issue_date |
++----------+---------+------------+------------+
+|        1 |       1 |        101 | 2026-01-20 |
++----------+---------+------------+------------+
+1 row in set (0.00 sec)
+
+mysql> SET autocommit = 1;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> UPDATE books
+    -> SET available_copies = available_copies - 1
+    -> WHERE book_id = 1;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> ROLLBACK;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT * FROM books;
++---------+--------------------+------------------+
+| book_id | title              | available_copies |
++---------+--------------------+------------------+
+|       1 | Python Programming |                3 |
+|       2 | Database Systems   |                3 |
++---------+--------------------+------------------+
+2 rows in set (0.00 sec)
+
+mysql> 
+mysql> SELECT * FROM books;
++---------+--------------------+------------------+
+| book_id | title              | available_copies |
++---------+--------------------+------------------+
+|       1 | Python Programming |                3 |
+|       2 | Database Systems   |                3 |
++---------+--------------------+------------------+
+2 rows in set (0.00 sec)
+
+mysql> \T
+Currently logging to file 'task03(tcl).txt'
+mysql> exit
